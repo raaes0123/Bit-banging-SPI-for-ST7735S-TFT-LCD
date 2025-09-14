@@ -1,0 +1,1 @@
+A software-based SPI (bit-banging) implementation to drive an ST7735S TFT LCD using GPIO pins on an STM32 microcontroller
