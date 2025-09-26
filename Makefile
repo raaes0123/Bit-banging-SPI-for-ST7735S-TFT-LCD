@@ -1,6 +1,6 @@
 CPU ?= cortex-m4
 
-all:
+build:
 	arm-none-eabi-gcc -mcpu=$(CPU) -mthumb -ggdb -c startup.s -o startup.o
 	arm-none-eabi-gcc -mcpu=$(CPU) -mthumb -ggdb -c main.c -o main.o
 	arm-none-eabi-gcc -mcpu=$(CPU) -mthumb -ggdb -c c_startup.c -o c_startup.o
@@ -11,14 +11,3 @@ all:
 clean:
 	rm -rf *.out *.elf *.debug *.o *.bin
 
-gdb:
-	gdb-multiarch main.elf \
-	-ex "target extended-remote localhost:3333" \
-	-ex "monitor reset halt" \
-	-ex "break reset_handler" \
-	-ex "break main" \
-	-ex "continue"
-
-
-ocd:
-	openocd -f interface/stlink.cfg -f target/stm32f1x.cfg
