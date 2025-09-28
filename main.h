@@ -4,7 +4,6 @@
 #define RCC_CFGR        *((volatile unsigned int*)0x40021004)
 #define RCC_APB2ENR     *((volatile unsigned int*)0x40021018)
 
-
 // GPIOA
 #define GPIOA_CRL       *((volatile unsigned int*)0x40010800)
 #define GPIOA_CRH       *((volatile unsigned int*)0x40010804)
@@ -38,4 +37,5 @@
 // AFIO
 #define AFIO_MAPR  (*(volatile uint32_t*)0x40010004)
 
-
+void delay_us(uint32_t us);
+void delay_ms(uint32_t us);

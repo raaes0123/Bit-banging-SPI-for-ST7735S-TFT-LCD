@@ -2,6 +2,37 @@
 #include "lcd.h"
 #include "main.h"
 
+
+void setPin(uint8_t pin){
+    GPIOB_ODR |= 1 << pin;
+}
+
+void clrPin(uint8_t pin){
+    GPIOB_ODR &= ~(1 << pin);
+}
+
+void spiWrite(uint8_t byte){
+    for(uint8_t i = 0 ; i < 8 ;i++){
+        clrPin(SCK);
+        (byte & 0x80) ? setPin(MOSI) : clrPin(MOSI);
+        byte <<= 1;
+        delay_us(10);
+        setPin(SCK);
+        delay_us(10);
+    }
+}
+
+void spiWrite12bit(uint16_t byte){
+    for(uint8_t i = 0 ; i < 12 ;i++){
+        clrPin(SCK);
+        (byte & 0x800) ? setPin(MOSI) : clrPin(MOSI);
+        byte <<= 1;
+        delay_us(1);
+        setPin(SCK);
+        delay_us(1);
+    }
+}
+
 void ST7735_Reset(){
     clrPin(RST);
     delay_ms(50);
@@ -122,3 +153,33 @@ void ST7735S_Init(void) {
     ST7735_Command(0x13);   // Normal display mode
     delay_ms(10);
 }
+
+void ST7735S_SetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
+    ST7735_Command(0x2A); // Column addr set
+    ST7735_Data(0x00);
+    ST7735_Data(x0);
+    ST7735_Data(0x00);
+    ST7735_Data(x1);
+
+    ST7735_Command(0x2B); // Row addr set
+    ST7735_Data(0x00);
+    ST7735_Data(y0);
+    ST7735_Data(0x00);
+    ST7735_Data(y1);
+
+    ST7735_Command(0x2C); // Write to RAM
+}
+
+void ST7735S_FillScreen(uint16_t color) {
+    ST7735S_SetAddrWindow(0, 0, 132, 132); // 132x132
+    uint16_t pixel_count = 132*132;
+    clrPin(CS);
+    setPin(DCX); // Data mode
+
+    for (uint16_t i = 0; i < pixel_count; i++) {
+        //uint16_t color = (((uint16_t)red) << 8) | (green << 4) | blue;
+        spiWrite12bit(color);
+    }
+    setPin(CS);
+}
+
